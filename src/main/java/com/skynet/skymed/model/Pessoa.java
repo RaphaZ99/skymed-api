@@ -29,9 +29,12 @@ public class Pessoa {
 	private String rg;
 	@Column(name = "pes_telefone")
 	private String telefone;
+	@Column(name = "pes_origem_paciente")
+	private String origemPaciente;
 	@OneToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "pes_end_iden")
 	private Endereco endereco;
+ 
 	@OneToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "pes_usu_iden")
 	private Usuario usuario;
@@ -119,8 +122,15 @@ public class Pessoa {
 		if (endereco == null) {
 			throw new Exception("Endereço inválido.");
 		}
-		this.endereco = endereco;
+	}
+ 
+
+	public String getOrigemPaciente() {
+		return origemPaciente;
 	}
 
+	public void setOrigemPaciente(String origemPaciente) {
+		this.origemPaciente = origemPaciente;
+	}
  
 }
