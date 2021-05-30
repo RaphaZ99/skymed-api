@@ -61,7 +61,7 @@ public class PessoaController {
 			return validacao;
 		}
 		var usuario = object.getUsuario();
-		if(object.getOrigemPaciente() != "mobile") {
+		if(!object.getOrigemPaciente().contains("mobile")) {
 			
 			
 			UUID uuid = UUID.randomUUID();
@@ -69,17 +69,22 @@ public class PessoaController {
 
 		
 			usuario.setTokenAutenticacaoEmail(getToken.geraToken());
-
-			usuario.setSenha(GeradorDeSenha.geraSenhaSegura(senhaAleatoria, usuario.getEmail()));
+            usuario.setSenha(GeradorDeSenha.geraSenhaSegura(senhaAleatoria, usuario.getEmail()));
 		    pessoaDB.save(object);
 		    
+		    servicoDeEmailPaciente.enviaEmail(object.getNome(), 
+					senhaAleatoria,
+					object.getUsuario().getSenha(),
+					usuario.getTokenAutenticacaoEmail());
+		            pessoaDB.save(object);
+			  object.getUsuario().setSenha("");
+		    
 			System.out.println(senhaAleatoria);
-
-		
-			
+ 	 	
 		}else {
-
-	    servicoDeEmailPaciente.enviaEmail(object.getNome(), 
+			
+        usuario.setSenha(GeradorDeSenha.geraSenhaSegura(object.getUsuario().getSenha(), usuario.getEmail()));
+        servicoDeEmailPaciente.enviaEmail(object.getNome(), 
 				usuario.getEmail(),
 				object.getUsuario().getSenha(),
 				usuario.getTokenAutenticacaoEmail());
@@ -88,7 +93,7 @@ public class PessoaController {
 		}
 		
 	 
-          return ResponseEntity.ok(object);
+         return ResponseEntity.ok(object);
 
 	}
 
