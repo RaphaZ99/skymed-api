@@ -182,7 +182,7 @@ public class PessoaController {
 		var paciente = pessoaDB.findByUsuarioId(id.longValue());
 
 		if (paciente != null) {
-			paciente.getUsuario().setSenha("");
+			
 
 			return ResponseEntity.ok(paciente);
 		} else {
