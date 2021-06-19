@@ -39,11 +39,11 @@ public class PessoaController {
 
 	private EmailService servicoDeEmailPaciente = new EmailService();
 	private final String PACIENTE_INEXISTENTE = "Paciente inexistente.";
-	
+
 	@ExceptionHandler({ NestedRuntimeException.class })
-    public ResponseEntity<Object> handleException(NestedRuntimeException ex) {
+	public ResponseEntity<Object> handleException(NestedRuntimeException ex) {
 		return ResponseEntity.badRequest().body(ex.getMostSpecificCause().getMessage());
-    }
+	}
 
 	@PostMapping
 	public ResponseEntity<Object> postPessoa(@RequestBody Pessoa object) throws Exception {
@@ -51,7 +51,7 @@ public class PessoaController {
 			var pessoa = getById(object.getId().intValue());
 
 			if (pessoa.getBody().equals(PACIENTE_INEXISTENTE)) {
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Paciente existente.");
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Paciente não existente.");
 			}
 		}
 
@@ -62,38 +62,38 @@ public class PessoaController {
 		}
 		var usuario = object.getUsuario();
 		if(!object.getOrigemPaciente().contains("mobile")) {
-			
-			
+
+
 			UUID uuid = UUID.randomUUID();
 			String senhaAleatoria = uuid.toString().substring(0, 8);
 
-		
+
 			usuario.setTokenAutenticacaoEmail(getToken.geraToken());
-            usuario.setSenha(GeradorDeSenha.geraSenhaSegura(senhaAleatoria, usuario.getEmail()));
-		    pessoaDB.save(object);
-		    
-		    servicoDeEmailPaciente.enviaEmail(object.getNome(), 
+			usuario.setSenha(GeradorDeSenha.geraSenhaSegura(senhaAleatoria, usuario.getEmail()));
+			pessoaDB.save(object);
+
+			servicoDeEmailPaciente.enviaEmail(object.getNome(), 
 					senhaAleatoria,
 					object.getUsuario().getSenha(),
 					usuario.getTokenAutenticacaoEmail());
-		            pessoaDB.save(object);
-			  object.getUsuario().setSenha("");
-		    
+			pessoaDB.save(object);
+			object.getUsuario().setSenha("");
+
 			System.out.println(senhaAleatoria);
- 	 	
+
 		}else {
-			
-        usuario.setSenha(GeradorDeSenha.geraSenhaSegura(object.getUsuario().getSenha(), usuario.getEmail()));
-        servicoDeEmailPaciente.enviaEmail(object.getNome(), 
-				usuario.getEmail(),
-				object.getUsuario().getSenha(),
-				usuario.getTokenAutenticacaoEmail());
-	            pessoaDB.save(object);
-		  object.getUsuario().setSenha("");
+
+			usuario.setSenha(GeradorDeSenha.geraSenhaSegura(object.getUsuario().getSenha(), usuario.getEmail()));
+			servicoDeEmailPaciente.enviaEmail(object.getNome(), 
+					usuario.getEmail(),
+					object.getUsuario().getSenha(),
+					usuario.getTokenAutenticacaoEmail());
+			pessoaDB.save(object);
+			object.getUsuario().setSenha("");
 		}
-		
-	 
-         return ResponseEntity.ok(object);
+
+
+		return ResponseEntity.ok(object);
 
 	}
 
@@ -174,19 +174,19 @@ public class PessoaController {
 
 		return ResponseEntity.ok(pacientes);
 	}
-	 
-	 @GetMapping(path = "usuario/{id}")
-	 @PreAuthorize("hasRole('USER')")
-	 public ResponseEntity<Object> getPacienteFromUsuarioId(@PathVariable("id") Integer id) {
-		 var paciente = pessoaDB.findByUsuarioId(id.longValue());
-		 
-		 if (paciente != null) {
-			 paciente.getUsuario().setSenha("");
-			
-			 return ResponseEntity.ok(paciente);
-		 } else {
-			 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(PACIENTE_INEXISTENTE);
-		 }
-	 }
+
+	@GetMapping(path = "usuario/{id}")
+	@PreAuthorize("hasRole('USER')")
+	public ResponseEntity<Object> getPacienteFromUsuarioId(@PathVariable("id") Integer id) {
+		var paciente = pessoaDB.findByUsuarioId(id.longValue());
+
+		if (paciente != null) {
+			paciente.getUsuario().setSenha("");
+
+			return ResponseEntity.ok(paciente);
+		} else {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(PACIENTE_INEXISTENTE);
+		}
+	}
 
 }

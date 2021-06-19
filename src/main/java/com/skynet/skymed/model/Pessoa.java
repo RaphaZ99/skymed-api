@@ -122,7 +122,10 @@ public class Pessoa {
 		if (endereco == null) {
 			throw new Exception("Endereço inválido.");
 		}
-	}
+		
+		this.endereco = endereco;
+		
+		}
  
 
 	public String getOrigemPaciente() {
