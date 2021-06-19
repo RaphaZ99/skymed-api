@@ -13,6 +13,7 @@ import com.sendgrid.helpers.mail.objects.Personalization;
 import com.skynet.skymed.interfaces.IEmailService;
 import com.skynet.skymed.model.Pessoa;
 import com.skynet.skymed.repository.UsuarioRepository;
+import com.skynet.skymed.util.SendGridAPIKey;
 
 public class EmailService implements IEmailService<Pessoa> {
 
@@ -53,7 +54,7 @@ public class EmailService implements IEmailService<Pessoa> {
 
 		mail.setTemplateId("d-ebfcaa73faad4f30a56c4bcaf59ee4dd");
 
-		SendGrid sg = new SendGrid(System.getenv("SENDGRID_API_KEY"));
+		SendGrid sg = new SendGrid(SendGridAPIKey.getAPIKey());
 
 		Request request = new Request();
 		try {

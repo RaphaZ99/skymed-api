@@ -72,10 +72,9 @@ public class PessoaController {
 			usuario.setSenha(GeradorDeSenha.geraSenhaSegura(senhaAleatoria, usuario.getEmail()));
 			pessoaDB.save(object);
 
-			servicoDeEmailPaciente.enviaEmail(object.getNome(), 
+			servicoDeEmailPaciente.enviaEmail(object.getNome(),object.getUsuario().getEmail(), 
 					senhaAleatoria,
-					object.getUsuario().getSenha(),
-					usuario.getTokenAutenticacaoEmail());
+					 usuario.getTokenAutenticacaoEmail());
 			pessoaDB.save(object);
 			object.getUsuario().setSenha("");
 
