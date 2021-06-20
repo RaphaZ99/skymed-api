@@ -1,5 +1,7 @@
 package com.skynet.skymed.controller;
 
+import java.util.NoSuchElementException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.NestedRuntimeException;
 import org.springframework.http.HttpStatus;
@@ -24,17 +26,35 @@ import com.skynet.skymed.model.Horario;
 @RequestMapping("/horario")
 public class HorarioController {
 	
+	final String HORARIO_INEXISTENTE = "HORARIO_INEXISTENTE";
 	@Autowired
 	private HorarioRepository horarioDB;
 	
 	@DeleteMapping("/{id}")
 	@PreAuthorize("hasRole('ADMIN')")
-	public ResponseEntity<Object> deleteHorario(@PathVariable("id") Long id) {
-				
+	public ResponseEntity<Object> deleteHorario(@PathVariable("id") Integer id) {
+		var horario = getById(id);	
+		
+		if(horario.getBody().equals(HORARIO_INEXISTENTE)) {
+			return horario;
+		}
 
-		horarioDB.deleteById((Long) id);
+		horarioDB.deleteById((long) id);
 
-		return ResponseEntity.ok(null);
+		return ResponseEntity.ok("Horario Excluido");
+	}
+	
+	@GetMapping("/{id}")
+	public ResponseEntity<Object> getById(@PathVariable("id") Integer id) {
+		try {
+			var horario = horarioDB.findById((long) id);
+
+			horario.get();
+
+			return ResponseEntity.ok(horario.get());
+		} catch (NoSuchElementException e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(HORARIO_INEXISTENTE);
+		}
 	}
 	
 	
