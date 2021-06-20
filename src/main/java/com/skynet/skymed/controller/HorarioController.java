@@ -49,7 +49,7 @@ public class HorarioController {
 		try {
 			var horario = horarioDB.findById((long) id);
 
-			horario.get();
+			
 
 			return ResponseEntity.ok(horario.get());
 		} catch (NoSuchElementException e) {
