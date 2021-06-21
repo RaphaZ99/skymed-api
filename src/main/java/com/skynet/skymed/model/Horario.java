@@ -28,12 +28,12 @@ public class Horario {
 	@Column(name = "hor_fim")
 	private Date fim;
 
-	@ManyToOne(cascade = CascadeType.ALL)
+	@ManyToOne
 	@JoinColumn(name = "hor_med_iden")
     @JsonBackReference(value = "medico")
 	private Medico medico;
 	
-	@ManyToOne(cascade = CascadeType.ALL)
+	@ManyToOne
 	@JoinColumn(name = "hor_pac_iden")
 	private Pessoa paciente;
 
