@@ -54,7 +54,7 @@ public class EmailService implements IEmailService<Pessoa> {
 
 		mail.setTemplateId("d-ebfcaa73faad4f30a56c4bcaf59ee4dd");
 
-		SendGrid sg = new SendGrid(SendGridAPIKey.getAPIKey());
+		SendGrid sg = new SendGrid(System.getenv("SENDGRID_API"));
 
 		Request request = new Request();
 		try {
