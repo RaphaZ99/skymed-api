@@ -1,6 +1,7 @@
 package com.skynet.skymed.controller;
 
 import java.util.NoSuchElementException;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.NestedRuntimeException;
@@ -20,14 +21,21 @@ import org.springframework.web.bind.annotation.RestController;
 import com.skynet.skymed.model.Usuario;
 
 import com.skynet.skymed.repository.UsuarioRepository;
+import com.skynet.skymed.service.EmailService;
 import com.skynet.skymed.util.GeradorDeSenha;
+import com.skynet.skymed.util.GeradorDeToken;
 
 @RestController
 @RequestMapping("/usuario")
 public class UsuarioController {
+	
 
 	@Autowired
 	private UsuarioRepository usuarioDB;
+	
+	private GeradorDeToken getToken = new GeradorDeToken();
+	
+	private EmailService servicoDeEmailPaciente = new EmailService();
   
 	@ExceptionHandler({ NestedRuntimeException.class })
     public ResponseEntity<Object> handleException(NestedRuntimeException ex) {
@@ -51,13 +59,49 @@ public class UsuarioController {
 
 		return ResponseEntity.ok(usuario);	
 	}
+	
+	@PutMapping(path = "recuperarsenha")
+	@PreAuthorize("hasRole('USUARIO')")
+	public ResponseEntity<Object> recuperarSenha(@RequestBody Usuario object){
+		var usuario = usuarioDB.findByEmail(object.getEmail());
+		if (usuario == null) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuário não existe. Tenta denovo");
+		}
+		usuario.setTokenRedefinicaoSenha(getToken.geraToken());
+		try {
+			servicoDeEmailPaciente.enviaEmail("Paciente", usuario.getEmail(), "", usuario.getTokenRedefinicaoSenha());
+			usuarioDB.save(usuario);
+			return ResponseEntity.ok(usuario);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
+	
+	@PutMapping(path = "alterarsenha")
+	@PreAuthorize("hasRole('USUARIO')")
+	public ResponseEntity<Object> alterarSenha(@RequestBody Usuario object){
+		var usuario = usuarioDB.findByEmail(object.getEmail());
+		if (usuario == null) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuário não existe. Tenta denovo");
+		}
+		usuario.setSenha(GeradorDeSenha.geraSenhaSegura(object.getSenha(), usuario.getEmail()));
+		usuarioDB.save(usuario);
+		return ResponseEntity.ok(usuario);
+		
+	 
+	}
 
 	@PutMapping(path = "trocarSenha")
 	@PreAuthorize("hasRole('USUARIO')")
 	public ResponseEntity<Object> trocarSenha(@RequestBody Usuario object) {
 		var usuario = usuarioDB.findByEmail(object.getEmail());
 		var mensagemErro = "Senha incorreta.";
-
+		
+		
+		
 		if (usuario == null) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuário não existe. Re-efetue login.");
 		}
@@ -128,11 +172,11 @@ public class UsuarioController {
 	@GetMapping(path = "/{email}")
 	public ResponseEntity<Object> getByEmail(@PathVariable("email") String email) {
 		try {
-			var pessoa = usuarioDB.findByEmail(email);
+			var usuario = usuarioDB.findByEmail(email);
 
-			pessoa.setSenha("");
+			usuario.setSenha("");
 
-			return ResponseEntity.ok(pessoa);
+			return ResponseEntity.ok(usuario);
 
 		} catch (NoSuchElementException e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Erro ao recuperar usuário");
