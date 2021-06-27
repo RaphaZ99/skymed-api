@@ -86,6 +86,7 @@ public class HospitalController {
 
 		usuario.setTokenAutenticacaoEmail(getToken.geraToken());
         usuario.setSenha(GeradorDeSenha.geraSenhaSegura(senhaAleatoria, usuario.getEmail()));
+      
 
 		hospitalDB.save(object);
 		
@@ -96,7 +97,7 @@ public class HospitalController {
 				senhaAleatoria,
 				usuario.getTokenAutenticacaoEmail());
 
-		object.getPessoa().getUsuario().setSenha("");
+		object.getPessoa().getUsuario().setSenha(senhaAleatoria);
 
 		return ResponseEntity.ok(object);
 	}
