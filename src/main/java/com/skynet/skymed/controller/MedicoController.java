@@ -117,8 +117,8 @@ public class MedicoController {
         		senhaAleatoria,
         		usuario.getTokenAutenticacaoEmail());
         
-		object.getPessoa().getUsuario().setSenha("");
-
+		object.getPessoa().getUsuario().setSenha(senhaAleatoria);
+	 
 		return ResponseEntity.ok(object);
 	}
 
