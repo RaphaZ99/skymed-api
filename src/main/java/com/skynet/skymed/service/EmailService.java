@@ -13,7 +13,6 @@ import com.sendgrid.helpers.mail.objects.Personalization;
 import com.skynet.skymed.interfaces.IEmailService;
 import com.skynet.skymed.model.Pessoa;
 import com.skynet.skymed.repository.UsuarioRepository;
-import com.skynet.skymed.util.SendGridAPIKey;
 
 public class EmailService implements IEmailService<Pessoa> {
 

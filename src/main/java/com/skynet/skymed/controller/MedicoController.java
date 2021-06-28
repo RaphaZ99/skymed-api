@@ -130,12 +130,16 @@ public class MedicoController {
 		}
 
 		var medico = getById(object.getId().intValue());
-
-		if (medico.getBody().equals(MEDICO_INEXISTENTE)) {
+         
+	    if (medico.getBody().equals(MEDICO_INEXISTENTE)) {
 			return medico;
 		}
-
-		var validacao = new ValidacaoPessoaService(pessoaDB).valideAtualizacao(object.getPessoa());
+	    
+	    var getBody  = (Medico)medico.getBody();
+	    
+		object.setHospital(getBody.getHospital());
+		
+	    var validacao = new ValidacaoPessoaService(pessoaDB).valideAtualizacao(object.getPessoa());
 
 		if (validacao != null) {
 			return validacao;
@@ -160,6 +164,7 @@ public class MedicoController {
 				} else {
 					return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Paciente inexistente.");
 				}
+				 
 				
 				horario.setMedico(object);
 			}
