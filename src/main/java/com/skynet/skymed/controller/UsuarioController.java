@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.skynet.skymed.model.Usuario;
-
+import com.skynet.skymed.repository.PessoaRepository;
 import com.skynet.skymed.repository.UsuarioRepository;
 import com.skynet.skymed.service.EmailService;
 import com.skynet.skymed.util.GeradorDeSenha;
@@ -32,6 +32,9 @@ public class UsuarioController {
 
 	@Autowired
 	private UsuarioRepository usuarioDB;
+	
+	@Autowired
+	private PessoaRepository pessoaDB;
 	
 	private GeradorDeToken getToken = new GeradorDeToken();
 	
@@ -68,12 +71,15 @@ public class UsuarioController {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuário não existe. Tenta denovo");
 		}
 		usuario.setTokenRedefinicaoSenha(getToken.geraToken());
+		var paciente = pessoaDB.findByUsuarioId(object.getId());
+		
 		try {
-			servicoDeEmailPaciente.enviaEmail("Paciente", usuario.getEmail(), "", usuario.getTokenRedefinicaoSenha());
+			servicoDeEmailPaciente.enviaEmailRecuperarSenha(paciente.getNome(),usuario.getEmail(),usuario.getTokenRedefinicaoSenha());
 			usuarioDB.save(usuario);
 			return ResponseEntity.ok(usuario);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
+			
+			
 			e.printStackTrace();
 		}
 		

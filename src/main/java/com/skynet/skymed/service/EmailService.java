@@ -66,5 +66,54 @@ public class EmailService implements IEmailService<Pessoa> {
 			ex.printStackTrace();
 		}
 	}
+	
+ 
+	public void enviaEmailRecuperarSenha(String nomeUsuario, String emailUsuario,String tokenUsuario)
+			throws Exception {
+
+		Mail mail = new Mail();
+
+		Email from = new Email();
+		from.setName("Skymed");
+		from.setEmail("skymedsoluttions@gmail.com");
+		mail.setFrom(from);
+
+		String subject = "Olá aqui está seu código para redefinir sua senha";
+		mail.setSubject(subject);
+
+		Personalization personalization = new Personalization();
+
+		Email to = new Email();
+		to.setEmail(emailUsuario);
+		to.setName(nomeUsuario);
+		personalization.addTo(to);
+
+		personalization.setSubject(subject);
+
+		personalization.addDynamicTemplateData("Customer_Name", nomeUsuario);
+		personalization.addDynamicTemplateData("Token", tokenUsuario);
+		mail.addPersonalization(personalization);
+
+		Content content = new Content();
+		content.setType("text/html");
+		content.setValue("Something");
+		mail.addContent(content);
+
+		mail.setTemplateId("d-26216deedb8d4fda952731d9633d44fa");
+
+		SendGrid sg = new SendGrid(System.getenv("SENDGRID_API"));
+
+		Request request = new Request();
+		try {
+			request.setMethod(Method.POST);
+			request.setEndpoint("/mail/send");
+			request.setBody(mail.build());
+			Response response = sg.api(request);
+
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+
 
 }
